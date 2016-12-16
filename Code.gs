@@ -3,13 +3,22 @@ SHEET = SS.getSheetByName("data");
 KEYS = SHEET.getRange(1, 1, 1, SHEET.getLastColumn()).getValues()[0];
 DEFAULT_START_TIME = 9; // Hours
 DEFAULT_EVENT_LENGTH = 2; //Hours
-//DO_RUN = true;
-DO_RUN = false;
+DO_RUN = true;
+//DO_RUN = false;
 
 // Need tofix the bug that is overwriting the head in column L (Object ID)
 
 
-COLUMNS = keyColumns();
+HEADERS = keyColumns();
+
+
+function runTrigger() {
+  if (DO_RUN == true) {
+//   SS.toast("Syncing to calendar");   
+   syncSheetToCalendar(); 
+  }
+}
+
 
 function sortCalendar() {
   loadVariables();
@@ -173,16 +182,12 @@ function countRows(arr) {
   Logger.log("There are " + arr.length + " rows in the active range");  
 }
 
-function runTrigger() {
-  if (DO_RUN == true) {
-   syncSheetToCalendar(); 
-  }
-}
 
 
 function syncSheetToCalendar() {
   loadVariables();
   updateObjIds();
+  SS.toast("Syncing to calendar"); 
   allRows = getNonBlankRows(SHEET, true);
   allRows = _._filter(allRows, function(x) { return (x[0] != "")});
   countRows(allRows);

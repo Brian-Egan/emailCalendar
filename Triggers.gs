@@ -19,6 +19,8 @@ function onEdit(e){
       }
 //      updateObjIds(i);
     } else {
+      Logger.log("Updating - " + range.getRow());
+      
       setRowIfNeeded(range.getRow());
       setUpdatedAtIfNeeded(range.getRow());
 //      updateObjIds(range.getRow());
@@ -27,22 +29,28 @@ function onEdit(e){
 }
 
 function setUpdatedAtIfNeeded(rowNum) {
-  if (isNull(SHEET.getRange(rowNum, 1, 1, KEYS.indexOf("Notes")).getValues()[0]) == false) {
-    SHEET.getRange(rowNum, KEYS.indexOf('Updated At') + 1, 1, 1).setValue(new Date());
+  Logger.log("In updated at for row num " + rowNum);
+//  if (isNull(SHEET.getRange(rowNum, 1, 1, KEYS.indexOf("Notes")).getValues()[0]) == false) {
+  Logger.log(HEADERS);
+  
+  var lastCol = HEADERS["URL"];
+  Logger.log("-------\n" + lastCol);
+  if (isNull(SHEET.getRange(rowNum, 1, 1, lastCol).getValues()[0]) == false) {
+    SHEET.getRange(rowNum, HEADERS['Updated At'], 1, 1).setValue(new Date());
 //    SHEET.getRange(rowNum, KEYS.indexOf('Updated At') + 2, 1, 1).setValue("Updated " + Session.getEffectiveUser().getEmail());
   } else {
-    SHEET.getRange(rowNum, KEYS.indexOf('Updated At') + 1, 1, 1).setValue(null);
+    SHEET.getRange(rowNum, HEADERS['Updated At'], 1, 1).setValue(null);
   }    
 }
 
 function setRowIfNeeded(rowNum) {
-  var idIndex = idIndex || (KEYS.indexOf("ObjID") + 1);
+  var idIndex = idIndex || HEADERS["ObjID"];
   if (
      ((SHEET.getRange(rowNum, idIndex, 1).getValue() == "") == true)
-    && (isNull(SHEET.getRange(rowNum, 1 , 1, KEYS.indexOf("Notes")).getValues()[0]) == false)
+    && (isNull(SHEET.getRange(rowNum, 1 , 1, HEADERS["Initial Creative Due"] - 1).getValues()[0]) == false)
     ) {
     setIdCell(rowNum);
- } else if ((isNull(SHEET.getRange(rowNum, 1 , 1, KEYS.indexOf("Notes")).getValues()[0]) == true) && (SHEET.getRange(rowNum, 11).getValues()[0] == "")) {
+ } else if ((isNull(SHEET.getRange(rowNum, 1 , 1, HEADERS["Initial Creative Due"] - 1).getValues()[0]) == true) && (SHEET.getRange(rowNum, HEADERS['GCal ID']).getValues()[0] == "")) {
   Logger.log("Removing? ID: " + SHEET.getRange(rowNum, idIndex, 1).getValue());
   setIdCell(rowNum, true);
   }
@@ -62,6 +70,7 @@ function setIdCell(rowNum, toNull) {
 }
 
 function formSubmit(e) {
+  Logger.log("Form submitted");
   DO_RUN = false;
   var resp = e.namedValues;
   var newRow = [];
@@ -73,6 +82,8 @@ function formSubmit(e) {
 		'Requested',
 		'Email Address',
 		'Notes',
+        'Link',
+        '',
         '','','','','','','Timestamp'
 		], function(x) {
 			if ((x == "Requested") || (x == "")) {
@@ -82,9 +93,9 @@ function formSubmit(e) {
 			}
 		});
   var lastRow = SHEET.appendRow(newRow).getLastRow();
-  var formulas = SS.getSheetByName("rawFormulas").getRange("h2:k2").getFormulasR1C1();
-  SHEET.getRange(lastRow, KEYS.indexOf('Notes') + 2, 1, 4).setFormulasR1C1(formulas);
+  var formulas = SS.getSheetByName("rawFormulas").getRange(2,HEADERS['Initial Creative Due'],1,4).getFormulasR1C1();
+  SHEET.getRange(lastRow, HEADERS['Initial Creative Due'], 1, 4).setFormulasR1C1(formulas);
 //  updateObjIds();
-  SHEET.getRange(lastRow, KEYS.indexOf('ObjID') + 1, 1, 1).setValue(lastRow);
+  SHEET.getRange(lastRow, HEADERS['ObjID'], 1, 1).setValue(lastRow);
   DO_RUN = true;
 }

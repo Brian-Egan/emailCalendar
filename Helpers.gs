@@ -6,9 +6,9 @@ function loadVariables() {
 function keyColumns() {
   KEYS = KEYS == undefined ? KEYS : SHEET.getRange(1, 1, 1, SHEET.getLastColumn()).getValues()[0];
   i = 1;
-  COLUMNS = {};
-  _._each(KEYS, function(x) { COLUMNS[x] = i; i += 1});
-  return COLUMNS;
+  HEADERS = {};
+  _._each(KEYS, function(x) { HEADERS[x] = i; i += 1});
+  return HEADERS;
 }
 
 
