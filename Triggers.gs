@@ -4,7 +4,6 @@ function onEdit(e){
   Logger.log("Triggered!");
   if (
     (range.getSheet().getSheetName() == SHEET.getSheetName()) 
-//    && (range.getColumn() != idIndex)
     && (range.getColumn() <= (KEYS.indexOf("Notes") + 1))
     && (range.getRow() > 1)
   ) {
@@ -23,7 +22,6 @@ function onEdit(e){
       
       setRowIfNeeded(range.getRow());
       setUpdatedAtIfNeeded(range.getRow());
-//      updateObjIds(range.getRow());
     }
   }
 }
@@ -74,28 +72,35 @@ function formSubmit(e) {
   DO_RUN = false;
   var resp = e.namedValues;
   var newRow = [];
-  	_._each([
+  var rowHeaders = [
 		'Requested Deploy Date',
 		'Network',
 		'Show/Topic/List/Concept To Promote',
 		'Reason for Promotion',
 		'Requested',
 		'Email Address',
-		'Notes',
+		'Messaging and Notes',
         'Link',
         '',
         '','','','','','','Timestamp'
-		], function(x) {
+		];
+  	_._each(rowHeaders, function(x) {
 			if ((x == "Requested") || (x == "")) {
 				newRow.push(x);
 			} else {
+              if (resp[x] == undefined) {
+                MailApp.sendEmail("brian_egan@discovery.com", "Was undefined  " + x, "This was undefined \n" + resp[x])
+                newRow.push("");
+              } else {
 				newRow.push(resp[x][0]);
+              }
 			}
 		});
   var lastRow = SHEET.appendRow(newRow).getLastRow();
   var formulas = SS.getSheetByName("rawFormulas").getRange(2,HEADERS['Initial Creative Due'],1,4).getFormulasR1C1();
   SHEET.getRange(lastRow, HEADERS['Initial Creative Due'], 1, 4).setFormulasR1C1(formulas);
-//  updateObjIds();
   SHEET.getRange(lastRow, HEADERS['ObjID'], 1, 1).setValue(lastRow);
   DO_RUN = true;
+//  DO_RUN = false;
 }
+

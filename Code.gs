@@ -19,11 +19,16 @@ function runTrigger() {
   }
 }
 
+function forceSort() {
+ sortCalendar(true); 
+}
 
-function sortCalendar() {
+
+function sortCalendar(force) {
+  force = force == undefined ? false : force 
   loadVariables();
   updatedAt = DriveApp.getFileById(SS.getId()).getLastUpdated();
-  if (((new Date() - updatedAt)/60000) > 5) {
+  if ((((new Date() - updatedAt)/60000) > 5) || (force == true)) {
     // More than 5 minutes has elapsed.
     allRows = getNonBlankRows(SHEET, true);
     allRows = _._filter(allRows, function(x) { return (x[0] != "")});
@@ -191,7 +196,7 @@ function syncSheetToCalendar() {
   allRows = getNonBlankRows(SHEET, true);
   allRows = _._filter(allRows, function(x) { return (x[0] != "")});
   countRows(allRows);
-  allRows = $2D.filterByDate(allRows, 0, new Date(), new Date().addMonths(1));
+  allRows = $2D.filterByDate(allRows, 0, new Date(), new Date().addMonths(2));
   countRows(allRows);
   rowObjs = $.splitRangesToObjectsNoCamel(KEYS, allRows);  
   _._each(rowObjs, function(x) {
