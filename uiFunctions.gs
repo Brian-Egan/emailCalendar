@@ -6,6 +6,9 @@ function onOpen() {
       .addSeparator()
 //      .addItem('Generate Smartlink', 'generateSmartlink')
   .addItem('Sort Chronologically', 'forceSort')
+  .addSeparator()
+  .addItem("Write all to Doc")
+  .addItem("Write topline to Doc")
       .addToUi();
 }
 

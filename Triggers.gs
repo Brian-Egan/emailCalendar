@@ -70,6 +70,60 @@ function setIdCell(rowNum, toNull) {
 function formSubmit(e) {
   Logger.log("Form submitted");
   DO_RUN = false;
+  SS.getSheetByName("variables").getRange("I1").setValue(true);
+}
+
+function hasNewFormData(set) {
+ var set = set == undefined ? SS.getSheetByName("variables").getRange("I1").getValue() : SS.getSheetByName("variables").getRange("I1").setValue(set);
+ return set;
+}
+
+function dataSheetLastUpdated(setUpdated) {
+ var setUpdated = setUpdated == undefined ? SS.getSheetByName("variables").getRange("I2").getValue() : SS.getSheetByName("variables").getRange("I2").setValue(setUpdated);
+ return setUpdated;
+}
+
+function updateIfNewData() {
+  // This should run every ~10 min or so
+  if (hasNewFormData() == true) {
+    var lastUpdatedAt = dataSheetLastUpdated();
+    var formSheet = SS.getSheetByName("Form Responses 1");
+    var headers = formSheet.getRange(1,1,1,formSheet.getLastColumn()).getValues()[0];
+    var formEntries = $.splitRangesToObjects(headers, formSheet.getRange(2,1, formSheet.getLastRow(), formSheet.getLastColumn()).getValues());
+    var newEntries = _._filter(formEntries, function(x) { return (x.timestamp > lastUpdatedAt)});
+    DATA_HEADERS = keyColumns();
+    if (newEntries.length > 0) {
+      _._each(newEntries, function(e) {
+        var newRow = [
+          e.requestedDeployDate, 
+          e.network,
+          e.showepisodetopiclistconceptToPromote,
+          e.reasonForPromotion, 
+          "Requested",
+          e.requestedBy,
+          ("PRIMARY MESSAGE: " + e.primaryMarketingMessage + "\nSECONDARY MESSAGE: " + e.secondaryMarketingMessage),
+          e.additionalItemsToPromote,
+          e.addtlInfonotes,
+          e.link
+        ];
+        var lastRow = SHEET.appendRow(newRow).getLastRow();
+        var formulas = SS.getSheetByName("rawFormulas").getRange(2,DATA_HEADERS['Initial Creative Due'],1,4).getFormulasR1C1();
+        SHEET.getRange(lastRow, DATA_HEADERS['ObjID'], 1, 1).setValue(lastRow);
+        DO_RUN = true;
+      });
+      newUpdatedAt = _._last(newEntries).timestamp; 
+    } else {
+      newUpdatedAt = new Date();
+    }                 
+    dataSheetLastUpdated(newUpdatedAt);
+    hasNewFormData(false);
+  } else {
+//    Logger.log("Did not run. No new entries");
+  }
+}
+
+function updateWithFormResponses(e) {
+  // This is no longer used as of 3/29 - replaced with 'updateIfNewData()'
   var resp = e.namedValues;
   var newRow = [];
   var rowHeaders = [

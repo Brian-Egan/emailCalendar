@@ -55,7 +55,7 @@ function rowToObject(rowNum) {
   for (x in arr) { 
    obj[KEYS[x]] = arr[x]; 
   }
-  Logger.log(obj);
+//  Logger.log(obj);
   return obj; 
 }
 
@@ -67,7 +67,7 @@ function rowArrayToObject(arr) {
 //   Logger.log("| " + KEYS[x] + " = " + arr[x]);
    obj[KEYS[x]] = arr[x]; 
   }
-  Logger.log(obj);
+//  Logger.log(obj);
   return obj; 
 }
 
@@ -99,9 +99,9 @@ function getDeletedRowsWithGCalIds(sht, hasHeader) {
   }
   allRows = sht.getRange(startRow, 1, numRows, sht.getLastColumn()).getValues();
 //  allRows = setIds(allRows);
-  Logger.log(allRows.length);
+//  Logger.log(allRows.length);
   allRows = _._filter(allRows, function(x) { return ((x[0] == "") && ((KEYS.indexOf('GCal ID') + 1) != ""))});
-  Logger.log(allRows);
+//  Logger.log(allRows);
   return allRows;
 }
 
@@ -110,10 +110,10 @@ function syncDeletedEventsAndUpdateIds() {
  var rows = getDeletedRowsWithGCalIds(SHEET, true);
   if (rows.length > 0) {
  var rowObjs = $.splitRangesToObjectsNoCamel(KEYS, rows); 
- Logger.log(rowObjs.length);
- Logger.log(rowObjs);
+// Logger.log(rowObjs.length);
+// Logger.log(rowObjs);
  var resetStartRow = rowObjs[0]["ObjID"];
-  Logger.log(resetStartRow - 1);
+//  Logger.log(resetStartRow - 1);
   _._each(rowObjs, function(r) {
     deleteEventFromGCal(r['GCal ID']);
     SHEET.deleteRow(r['ObjID']);
@@ -150,9 +150,9 @@ function updateObjIds(startAt) {
 //  Logger.log("And our last row is " + SHEET.getLastRow());
  var GCalIDs = SHEET.getRange(startAt, 12, SHEET.getLastRow(), 1).getValues();
 //  Logger.log("IDs length is " + GCalIDs.length);
-  Logger.log(GCalIDs);
+//  Logger.log(GCalIDs);
  var endAt = _._filter(GCalIDs, function(x) { return (x[0] != "")}).length;
- Logger.log(endAt);
+// Logger.log(endAt);
  var currRow = startAt;
   while (currRow <= endAt) {
    setIdCell(currRow, false); 
@@ -178,9 +178,9 @@ function setIds(arr) {
 function rowsToObjects(allRows) {
   allRows = allRows || getNonBlankRows(SHEET, true);
   objects = _._map(allRows, function(x) { return rowArrayToObject(x)});
-  Logger.log("Now as one object!\n---------\n");
-  Logger.log(objects);
-  Logger.log(objects[1]["Network"]); 
+//  Logger.log("Now as one object!\n---------\n");
+//  Logger.log(objects);
+//  Logger.log(objects[1]["Network"]); 
 }
 
 function countRows(arr) {
@@ -192,6 +192,7 @@ function countRows(arr) {
 function syncSheetToCalendar() {
   loadVariables();
   updateObjIds();
+  updateIfNewData();
   SS.toast("Syncing to calendar"); 
   allRows = getNonBlankRows(SHEET, true);
   allRows = _._filter(allRows, function(x) { return (x[0] != "")});
@@ -209,8 +210,8 @@ function syncSheetToCalendar() {
       event = CAL.getEventSeriesById(x["GCal ID"]);
       if (x['Updated At'] > event.getLastUpdated())  {
 //      if 
-        Logger.log("Updated at is " + x["Updated At"]);
-        Logger.log("Event updated at is " + event.getLastUpdated());
+//        Logger.log("Updated at is " + x["Updated At"]);
+//        Logger.log("Event updated at is " + event.getLastUpdated());
       
       // if event.getLastUpdated() > obj['Updated At'] - Use to not do every one and only get changed.
         ev = toEvent(x);
@@ -221,8 +222,8 @@ function syncSheetToCalendar() {
         event.setRecurrence(CalendarApp.newRecurrence().addDailyRule().times(1), ev.start, ev.end);
         x["Updated At"] = setUpdatedTo;
       } else {
-        Logger.log("Updated at is " + x["Updated At"]);
-        Logger.log("Event updated at is " + event.getLastUpdated());
+//        Logger.log("Updated at is " + x["Updated At"]);
+//        Logger.log("Event updated at is " + event.getLastUpdated());
       }
     }
 //    x["Updated At"] = setUpdatedTo;

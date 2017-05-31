@@ -47,7 +47,7 @@ function toEvent(obj) {
     "title":  (nickname + ": " + obj['Show/Topic/Concept'] + " [" + obj['Promoting'] + "]"),
     "start": obj["Deploy Date"].addHours(DEFAULT_START_TIME),
     "end": obj['Deploy Date'].addHours(DEFAULT_START_TIME + DEFAULT_EVENT_LENGTH),
-    "description": obj["Notes"],
+    "description": (obj["Notes"] + "\n---------\nAdditional Promotables: " + obj["Additional Promotables"]),
     "location": ("Status: " + obj['Status'])
   }
 }
